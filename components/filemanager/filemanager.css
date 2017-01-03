@@ -1,0 +1,63 @@
+.filemanager-root-folder
+{
+	font-weight: normal;
+    margin-left: -24px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    list-style-type: none;
+	margin-bottom: 0px;
+}
+
+.filemanager-folder-list
+{
+    margin-top:0px;
+	padding-left:0px;
+	padding-bottom:2px;
+}
+.filemanager-folder-list ol
+{
+	padding-left:10px;
+}
+.filemanager-item li
+{
+	position: relative;
+	list-style: none;
+	display:block;
+	cursor: pointer;
+}
+.filemanager-item span
+{
+	padding-left: 15px;
+    display:block;
+}
+.filemanager-item span.active
+{
+	background:#555;
+	display:block;
+
+}
+.filemanager-item span:hover
+{
+	background:#333;
+    display:block;
+}
+
+.filemanager-folder
+{
+	display: block;
+	padding-left: 8px;
+	text-decoration: none;
+	color: #569CD6;
+	cursor: pointer;
+}
+
+.filemanager-file
+{
+	background-repeat: no-repeat;
+	color: #DCDCDC;
+    padding-left: 8px;
+	text-decoration: none;
+	display: block;
+	cursor: pointer;
+	overflow: hidden;
+}
