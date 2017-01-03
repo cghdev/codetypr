@@ -1,0 +1,73 @@
+body{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+#main-container {
+    background-color: #1E1E1E;
+    width:100%;
+    height:100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+#toolbox-container {
+    order: 1;
+    background-color: #222;
+    width: 240px;
+    height: 100%;
+    float: left;
+    display: inline-flex;
+    overflow: auto;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#editor-container{
+    order: 3;
+    background-color: black;
+    height: calc(100% - 25px);
+
+    width: 100%;
+    float: left;
+    top:25px;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#editor-top{
+    background-color: #222222;
+    height: 25px;
+    width: 100%;
+    padding-top: 5px;
+}
+#editor{
+    background-color: #1E1E1E;
+    height: 100%;
+    width: 100%;
+}
+#main-splitter{
+    order:2;
+    width:6px;
+    height: calc(100% - 25px);
+    background-color: #1E1E1E;
+    float: left;
+    cursor: col-resize;
+    position: fixed;
+    top: 30px;
+}
+.ct-editor-lang {
+    color: lightsteelblue;
+    font-size: smaller;
+    padding-left: 13px;
+}
+.ct-editor-document {
+    color: lightslategrey;
+    font-size: smaller;
+    padding-left: 25px;
+}
+.dropdown-menu>li>a {
+    cursor: hand;
+}
