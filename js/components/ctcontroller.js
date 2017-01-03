@@ -74,7 +74,7 @@ var CTController = function(){
             editor.onDidChangeModelContent(function(e){
                 if (!currentDoc.isDirty){
                     currentDoc.isDirty=true;
-                    instance.documents[currentDoc.file].isDirty=true;
+                    instance.app.documents[currentDoc.file].isDirty=true;
                     updateDirtyDocuments();
                 }
             });
