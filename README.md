@@ -37,3 +37,5 @@ Lauch the browser of your choice:
  https://localhost/codetypr  
 
 Good luck!
+
+Note: Backup your data before testing!! still in development!!!
