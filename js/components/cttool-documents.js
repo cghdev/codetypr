@@ -3,9 +3,14 @@ var CTDocuments = function(appController, tool){
     var instance = this;
     var documents = null;
     var listContainer;
-    var currentProject=null;
-    var contextMenu=null;
-    var contextMenuTarget=null;
+    var currentProject = null;
+    var contextMenu = null;
+    var contextMenuTarget = null;
+    var itemSelected = {
+        item:"",
+        itemType:"",
+        $element:""
+    }
     var itemContent={
         element:{},
         $node:{},
@@ -21,7 +26,7 @@ var CTDocuments = function(appController, tool){
     var toolItem = tool;
 
     this.initialize  = function(){
-        documents=$("<ol id='fs-documents' class='tool-files'></ol>");
+        documents=$("<ol id='fs-documents' class='tool-files' data-root='true' data-folder=''></ol>");
 
         var toolNewFile = $("<span class='tool-title-newFile glyphicon glyphicon-file' style='display:none'></span>");
         var toolNewFolder = $("<span class='tool-title-newFolder glyphicon glyphicon-folder-open'  style='display:none'></span>");
@@ -31,12 +36,28 @@ var CTDocuments = function(appController, tool){
 
         toolNewFolder.on("click",function(e){
             event.stopPropagation();
-            alert("new folder");
+            if (itemSelected.item!=null){
+                if (itemSelected.itemType=="file"){
+                    processNewFolder(itemSelected.$element.parent());
+                }else if (itemSelected.itemType=="folder"){
+                    processNewFolder(itemSelected.$element);
+                }
+            }else{
+                processNewFolder($(documents));
+            }
         });
 
         toolNewFile.on("click",function(e){
             event.stopPropagation();
-            alert("new file");
+            if (itemSelected.item!=null){
+                if (itemSelected.itemType=="file"){
+                    processNewFile(itemSelected.$element.parent());
+                }else if (itemSelected.itemType=="folder"){
+                    processNewFile(itemSelected.$element);
+                }
+            }else{
+                processNewFile($(documents));
+            }
         });
 
         toolItem.onEnter=function(){
@@ -89,7 +110,12 @@ var CTDocuments = function(appController, tool){
 
     this.load=function(project){
         currentProject=project;
+        documents[0].id="fs-folder-"+toSafeId(project.path);
+        documents.attr("data-folder",project.path);
         loadFolderTree(documents, project.path, true);
+        itemSelected.$element=null;
+        itemSelected.item=null;
+        itemSelected.itemType=null;
     };
 
     this.onNewItem=function(element, itemType, rootPath, itemName){};
@@ -100,11 +126,14 @@ var CTDocuments = function(appController, tool){
 
     this.onItemSelected=function(item){};
 
-    this.setItemSelected=function(item){
+    this.setItemSelected=function(item, itemType, $element){
+        itemSelected.item = item;
+        itemSelected.itemType= itemType;
+        itemSelected.$element = $element;
+
         if (instance.setItemActive(item.id)){
-            itemSelected = item;
             if (instance.onItemSelected)
-                instance.onItemSelected(item);
+                instance.onItemSelected(item, itemType);
         }
     };
 
@@ -126,7 +155,7 @@ var CTDocuments = function(appController, tool){
         var item=buildFsItem(item);
 	    var edting=$("#"+item.id).attr("data-editing");
         if (!editing || editing != "true")
-            setItemSelected(item);
+            setItemSelected(item, "file");
     };
 
     this.getItemSelected = function(){
@@ -150,13 +179,13 @@ var CTDocuments = function(appController, tool){
     function processNewFile(item){
         var itemEdit=beginEdit('newFile',item[0]);
         itemEdit.off('focusout').on('focusout', function(){
-            endEdit();
             event.stopPropagation();
+            endEdit();
         });
         itemEdit.off('keypress').on('keypress', function(e) {
-            if(e.which == 13) {                              
+            if(e.which == 13) {
+                event.stopPropagation();                              
                 endEdit();
-                event.stopPropagation();
             }
         });
     };
@@ -232,9 +261,13 @@ var CTDocuments = function(appController, tool){
             
             var path = $el.attr("data-folder");
             
+            if (!path){
+                path=currentProject.path;
+            } 
             if (getItemType($el) == "folder"){
                 path+=pathSeparator+$el.text();
             }
+            
 
             var node=buildFileNode(path,"New File");
             var id=toSafeId(path);
@@ -255,11 +288,17 @@ var CTDocuments = function(appController, tool){
         } else if(action=="newFolder") {
             
             var path = $el.attr("data-folder");
+            if (!path){
 
-            if ( getItemType($el) == "folder"){
-                path+=pathSeparator+$el.text();
+                path=currentProject.path;
+
+            }else{
+
+                if ( getItemType($el) == "folder"){
+                    path+=pathSeparator+$el.text();
+                }
+
             }
-            
             var id=toSafeId(path);
             
             if ($el.attr("data-collapsed")=="true"){
@@ -310,8 +349,6 @@ var CTDocuments = function(appController, tool){
             if (instance.onNewItem){
 
                 instance.onNewItem(itemType, rootPath, itemContent.newValue, function(){
-
-                    
 
                     $el.attr("data-folder",rootPath);
                     $el.attr("id","fs-"+id);
@@ -400,6 +437,10 @@ var CTDocuments = function(appController, tool){
                 $(this).attr("data-collapsed",true);
                 container.hide();
             }
+            var item=buildFsItem("folder", this.id, parentFolderPath, newFolderName);
+            if ($(this).attr("data-editing")!="true"){
+                instance.setItemSelected(item, "folder", folder);
+	        }
         });
         return folder;
     };
@@ -417,7 +458,7 @@ var CTDocuments = function(appController, tool){
             var item = buildFsItem("file", this.id, folder,el.text());
 
             if (el.attr("data-editing")!="true"){
-                instance.setItemSelected(item);
+                instance.setItemSelected(item, "file", file);
 	        }
         });
 	return  file;
@@ -425,6 +466,9 @@ var CTDocuments = function(appController, tool){
     
     function buildFsItem(fsItemType, fsId, folder, fileName){
         //var file=folder+pathSeparator+fileName;
+        if (!folder)
+            folder=currentProject.path;
+            
         if (currentProject)
             var ppath=folder.substring(currentProject.path.length+1);
 
@@ -435,16 +479,20 @@ var CTDocuments = function(appController, tool){
             location:folder,
             name: fileName,
             partialpath: ppath,
-	    file: folder + pathSeparator + fileName
+	        file: folder + pathSeparator + fileName
         }
 	    return item;
     };
 
     function getItemType(item){
-        if (item.hasClass("documents-folder")){
-            return "folder";
-        }else{
+        if (item.attr("data-root")=="true")return "root";
+        
+        if (item.hasClass("documents-file")){
             return "file";
+        }else if (item.hasClass("documents-folder"))
+        {
+            return "folder";
         }
+        return "";
     };
 }

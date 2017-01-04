@@ -57,7 +57,9 @@ var CTToolbox = function(){
             documents.load(item);
         };
 
-        documents.onItemSelected = function(item){
+        documents.onItemSelected = function(item, itemType){
+            if (itemType!="file") return;
+            
             selectedFile=item;
             recentDocuments.add(item);
             controller.app.openDocument(item.file);
