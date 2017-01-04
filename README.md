@@ -5,6 +5,11 @@ Web Editor powered by Monaco Editor
 
 This editor uses php for read/write files and create/delete directories and it has no implementation of any type of security. this is not intended for production sites.
 
+# Screenshot
+
+![alt tag](https://raw.githubusercontent.com/dlabella/codetypr/master/img/codetypr.jpg)
+
+
 # Installation on linux:
 
 replace /var/www by the directory where you www root path is.
